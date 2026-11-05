@@ -227,7 +227,7 @@ jobs:
     - prepare
     - model
     - tests
-    if: ${{ !cancelled() && needs.prepare.result == 'success' && needs.prepare.outputs.complete != 'true' }}
+    if: ${{ !cancelled() && needs.prepare.result == 'success' && needs.prepare.outputs.complete != 'true' && needs.prepare.outputs.stage != 'workflow' }}
     concurrency:
       group: ontolibrary-com-x-bus-effects-${{ github.repository }}
       queue: max
