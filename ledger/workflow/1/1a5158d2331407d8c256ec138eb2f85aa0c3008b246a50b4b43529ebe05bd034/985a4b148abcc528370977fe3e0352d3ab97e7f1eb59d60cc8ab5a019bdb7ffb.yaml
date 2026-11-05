@@ -1,0 +1,198 @@
+schema_version: 1
+compiler: 2
+source_sha256: 985a4b148abcc528370977fe3e0352d3ab97e7f1eb59d60cc8ab5a019bdb7ffb
+subject: README.md
+yardstick: bus/criteria.md
+roles:
+  implementer: chatgpt
+  pr_creator: gemini
+  proposer: chatgpt
+  reviewers: grok
+  scorer: claude
+independent_of:
+  implementer:
+  - reviewers
+  - scorer
+  proposer:
+  - reviewers
+  reviewers:
+  - implementer
+  - proposer
+  scorer:
+  - implementer
+limits:
+  budget_usd: 3
+  hours: 1
+  max_paid_calls: 6
+  revisions: 0
+start: step_1
+turns:
+  step_1:
+    kind: model
+    role: scorer
+    artifact: a score
+    instruction: "score the unchanged subject at the current `main` commit against the yardstick; return the unrounded total, the criterion scores and the criterion-level weaknesses"
+    reads:
+    - README.md
+    - bus/criteria.md
+    output_contract:
+      score:
+        type: number
+      criteria:
+        type: object
+      weaknesses:
+        type: list
+    on_outcome:
+      completed: step_2
+      rejected: REJECTED
+  step_2:
+    kind: model
+    role: proposer
+    artifact: an issue
+    instruction: "from the baseline, pick the single weakness that one extremely small change can address; state the exact modification, the criterion, the rationale and the predicted gain; if no legitimate small change remains, say so"
+    reads:
+    - README.md
+    - bus/criteria.md
+    inputs:
+      baseline_weaknesses: "{{step_1.weaknesses}}"
+    output_contract:
+      title:
+        type: string
+      body:
+        type: string
+      no_work:
+        type: bool
+    gate:
+      all:
+        duplicate: false
+    on_outcome:
+      completed: step_2_effect
+      rejected: REJECTED
+  step_2_effect:
+    kind: effect
+    role: proposer
+    effects:
+    - op: open_issue
+      title: "{{step_2.title}}"
+      body: "{{step_2.body}}"
+      labels:
+      - improvement-proposal
+    on_outcome:
+      completed: step_3
+      rejected: REJECTED
+  step_3:
+    kind: model
+    role: reviewers
+    artifact: a comment
+    instruction: "review the issue; approve only a small change that should raise the score"
+    reads:
+    - README.md
+    - bus/criteria.md
+    inputs:
+      issue_title: "{{step_2.title}}"
+      issue_body: "{{step_2.body}}"
+    output_contract:
+      body:
+        type: string
+      approved:
+        type: bool
+    effects:
+    - op: comment
+      issue: "{{step_2_effect.issue.number}}"
+      body: "{{step_3.body}}"
+    gate:
+      all:
+        approved: true
+    on_outcome:
+      completed: step_4
+      rejected: step_7
+  step_4:
+    kind: model
+    role: implementer
+    artifact: a branch
+    instruction: "apply only the approved change, as the full new file, on a new branch from the baseline's `main` commit; link the issue"
+    reads:
+    - README.md
+    inputs:
+      issue_title: "{{step_2.title}}"
+      issue_body: "{{step_2.body}}"
+    output_contract:
+      content:
+        type: string
+      message:
+        type: string
+    on_outcome:
+      completed: step_4_effect
+      rejected: step_7
+  step_4_effect:
+    kind: effect
+    role: implementer
+    effects:
+    - op: commit_branch
+      branch: "improvement-started-{{inputs.started}}-{{inputs.run}}-{{inputs.cycle}}-{{inputs.attempt}}"
+      base: "{{step_1.scored_sha}}"
+      message: "{{step_4.message}}"
+      files:
+      - path: README.md
+        content: "{{step_4.content}}"
+      bounds:
+        max_changed_lines: 12
+        paths:
+        - README.md
+    on_outcome:
+      completed: step_5
+      rejected: step_7
+  step_5:
+    kind: model
+    role: scorer
+    artifact: a score
+    instruction: "rescore the entire candidate against the unchanged yardstick; return the unrounded total, the criterion scores, coverage, quoted evidence and criterion-level weaknesses"
+    reads:
+    - README.md
+    - bus/criteria.md
+    output_contract:
+      score:
+        type: number
+      criteria:
+        type: object
+      coverage:
+        type: list
+      evidence:
+        type: list
+      weaknesses:
+        type: list
+    gate:
+      metric_delta_at_least:
+        field: score
+        against: step_1
+        min: 0.25
+    on_outcome:
+      completed: step_6
+      rejected: step_7
+  step_6:
+    kind: effect
+    role: pr_creator
+    artifact: a pull request
+    instruction: "open a draft pull request against `main` with the evidence"
+    effects:
+    - op: open_pr
+      title: "{{step_2.title}}"
+      head: "{{step_4_effect.branch.name}}"
+      base: main
+      draft: true
+      issue: "{{step_2_effect.issue.number}}"
+    on_outcome:
+      completed: ACCEPTED
+      rejected: REJECTED
+  step_7:
+    kind: effect
+    role: proposer
+    artifact: nothing
+    instruction: "close the issue it opened with the reason the cycle stopped"
+    effects:
+    - op: close_issue
+      issue: "{{step_2_effect.issue.number}}"
+      reason: "{{inputs.stop_reason}}"
+    on_outcome:
+      completed: REJECTED
+      rejected: REJECTED
