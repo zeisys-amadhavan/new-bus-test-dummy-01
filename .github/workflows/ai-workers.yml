@@ -33,6 +33,13 @@ jobs:
       matrix: ${{ steps.context.outputs.matrix }}
       revision: ${{ steps.context.outputs.revision }}
     steps:
+    - name: Validate the operator-approved executor pin
+      id: trust
+      env:
+        REVISION: ${{ vars.ONTOLIBRARY_COM_X_BUS_EXECUTOR_REVISION }}
+      run: |
+        [[ "$REVISION" =~ ^[0-9a-f]{40}$ ]] || exit 1
+        echo "revision=$REVISION" >> "$GITHUB_OUTPUT"
     - name: Read immutable reviewed worker implementation
       uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       with:
@@ -41,13 +48,6 @@ jobs:
         ref: ${{ steps.trust.outputs.revision }}
         path: harness
         persist-credentials: false
-    - name: Validate the operator-approved executor pin
-      id: trust
-      env:
-        REVISION: ${{ vars.ONTOLIBRARY_COM_X_BUS_EXECUTOR_REVISION }}
-      run: |
-        [[ "$REVISION" =~ ^[0-9a-f]{40}$ ]] || exit 1
-        echo "revision=$REVISION" >> "$GITHUB_OUTPUT"
     - name: Read operator-approved effect gate
       uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       with:
