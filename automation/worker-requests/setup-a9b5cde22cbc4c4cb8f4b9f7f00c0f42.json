@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "authored_by": "human:zeisys-amadhavan",
+  "expected_executor_revision": "eb03edd581583096681d141df7209232be108739",
+  "target": {
+    "repository": "zeisys-amadhavan/new-bus-test-dummy-01",
+    "commit": "f4a9e284a7675cdec73cf34379410ad442eb40e3",
+    "paths": [
+      "README.md"
+    ]
+  },
+  "task": "Canonical L2 capability smoke: review only the supplied exact-SHA files; identify scope, actual model identity and a next step. Never claim test execution or code repair.",
+  "capabilities": [
+    "target-read"
+  ],
+  "agents": {
+    "chatgpt": {
+      "adapter": "openai-responses",
+      "model": "gpt-6-luna",
+      "effort": "none",
+      "profile": "smoke-20261021-v2"
+    },
+    "claude": {
+      "adapter": "anthropic-messages",
+      "model": "claude-haiku-5-5",
+      "effort": "low",
+      "profile": "smoke-20261021-v2"
+    },
+    "grok": {
+      "adapter": "xai-responses",
+      "model": "grok-4.7",
+      "effort": "low",
+      "profile": "smoke-20261021-v2"
+    },
+    "gemini": {
+      "adapter": "gemini-generate-content",
+      "model": "gemini-3.5-flash-lite",
+      "effort": "disabled",
+      "profile": "smoke-20261021-v2"
+    }
+  }
+}
