@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "suite": "native-four-agent-conformance-v1",
+  "authored_by": "human:zeisys-amadhavan",
+  "expected_executor_revision": "bcdaf45feb74ba0a657ca347caab5b5cdeab6e8b",
+  "quick": true
+}
