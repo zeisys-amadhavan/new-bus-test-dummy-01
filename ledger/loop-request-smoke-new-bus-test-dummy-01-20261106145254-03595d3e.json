@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "authored_by": "human:zeisys-amadhavan",
+  "expected_executor_revision": "54b343d7cfdfef4558ffa271dfe0eb8379905e17",
+  "targets": [
+    {
+      "repository": "zeisys-amadhavan/new-bus-test-dummy-01",
+      "commit": "1a1c34e6b338e659992868baede9a945ce507d2b",
+      "paths": [
+        "README.md",
+        "bus/criteria.md"
+      ],
+      "test_profile": "python-unittest",
+      "ci_checks": [
+        "contracts"
+      ],
+      "branch": "ai-loop/new-bus-test-dummy-01-20261106145254",
+      "ci_app": "github-actions"
+    }
+  ],
+  "runtimes": {
+    "claude": {
+      "adapter": "anthropic-messages",
+      "model": "claude-opus-5-5",
+      "effort": "low"
+    },
+    "grok": {
+      "adapter": "xai-responses",
+      "model": "grok-4.7",
+      "effort": "low"
+    },
+    "gemini": {
+      "adapter": "gemini-generate-content",
+      "model": "gemini-4-argon",
+      "effort": "low"
+    },
+    "chatgpt": {
+      "adapter": "openai-responses",
+      "model": "gpt-6.1-sol",
+      "effort": "low"
+    }
+  },
+  "max_stages": 64,
+  "deadline_utc": "2026-11-06T15:52:54Z",
+  "budget_usd": 3.0,
+  "max_paid_calls": 8,
+  "resource_policy": {
+    "max_input_bytes": 32768,
+    "max_output_tokens": 4096,
+    "prices": {
+      "chatgpt": {
+        "model": "gpt-6.1-sol",
+        "input_usd_per_million": 2,
+        "output_usd_per_million": 10,
+        "valid_until": "2026-12-05T00:00:00Z",
+        "source": "https://developers.openai.com/api/docs/models/gpt-6.1-sol"
+      },
+      "claude": {
+        "model": "claude-opus-5-5",
+        "input_usd_per_million": 4,
+        "output_usd_per_million": 20,
+        "valid_until": "2026-12-05T00:00:00Z",
+        "source": "https://platform.claude.com/docs/en/models/opus-5-5/overview"
+      },
+      "grok": {
+        "model": "grok-4.7",
+        "input_usd_per_million": 2,
+        "output_usd_per_million": 6,
+        "valid_until": "2026-12-05T00:00:00Z",
+        "source": "https://docs.x.ai/developers/models/grok-4.7"
+      },
+      "gemini": {
+        "model": "gemini-4-argon",
+        "input_usd_per_million": 2,
+        "output_usd_per_million": 10,
+        "valid_until": "2026-12-01T00:00:00Z",
+        "source": "https://ai.google.dev/gemini-api/docs/pricing"
+      }
+    }
+  },
+  "task": "workflow 1 for issue #6",
+  "workflow": {
+    "path": "bus/workflow1.md",
+    "recipe_sha256": "985a4b148abcc528370977fe3e0352d3ab97e7f1eb59d60cc8ab5a019bdb7ffb",
+    "compiler_digest": "1a5158d2331407d8c256ec138eb2f85aa0c3008b246a50b4b43529ebe05bd034",
+    "issue": 6,
+    "cycles": 1,
+    "started": "202611061452"
+  }
+}
